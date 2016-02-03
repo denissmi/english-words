@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">English words</string>
+
+    <string name="english">Английские слова</string>
+    <string name="russian">Русские слова</string>
+    <string name="add">Добавить слова</string>
+    <string name="show">Просмотреть слова</string>
+    <string name="exit">Выход</string>
+    <string name="english_word">Слово по-английски:</string>
+	<string name="russian_word">Перевод на русский:</string>
+	<string name="add_word">Добавить</string>
+	<string name="answer">Ответить</string>
+	<string name="dont_know">Не знаю</string>
+	<string name="voice">Озвучить</string>
+	<string name="speech">Произнести</string>
+	<string name="hide">Скрыть</string>
+	<string name="show_word">Показать</string>
+	<string name="speech_prompt">Произнесите ответ&#8230;</string>
+	<string name="speech_not_supported">Извините! Ваше устройство не поддерживает речевой ввод</string>
+	<string name="alphabet">Отсортировать по алфавиту</string>
+	<string name="addition">Отсортировать по добавлению</string>
+	
+    
+</resources>
