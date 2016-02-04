@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.englishwords"
-        minSdkVersion 8
+        minSdkVersion 15
         targetSdkVersion 19
     }
 
