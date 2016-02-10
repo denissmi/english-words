@@ -7,3 +7,5 @@
 /app/build
 /android/build
 gradle.properties
+gradlew
+/gradle
