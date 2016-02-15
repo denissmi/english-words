@@ -14,7 +14,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".MainActivity"
+            android:name=".android.MainActivity"
             android:screenOrientation="portrait"
             android:label="@string/app_name" >
             <intent-filter>
@@ -24,22 +24,27 @@
             </intent-filter>
         </activity>
         <activity 
-	        android:name=".AddWord"
+	        android:name=".android.AddWord"
             android:screenOrientation="portrait"
 	        android:label="@string/app_name">
     	</activity>
     	<activity 
-	        android:name=".CheckWords"
+	        android:name=".android.CheckWords"
             android:screenOrientation="portrait"
 	        android:label="@string/app_name">
     	</activity>
     	<activity 
-	        android:name=".ShowWords"
+	        android:name=".android.ShowWords"
             android:screenOrientation="portrait"
 	        android:label="@string/app_name">
     	</activity>
+        <activity
+            android:name=".android.LoadDictionary"
+            android:screenOrientation="portrait"
+            android:label="@string/app_name">
+        </activity>
     	<activity 
-	        android:name=".TTSManager"
+	        android:name=".android.TTSManager"
 	        android:label="@string/app_name">
     	</activity>
     </application>

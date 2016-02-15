@@ -2,7 +2,6 @@
 <resources>
 
     <string name="app_name">English words</string>
-
     <string name="english">Английские слова</string>
     <string name="russian">Русские слова</string>
     <string name="add">Добавить слова</string>
@@ -21,6 +20,7 @@
 	<string name="speech_not_supported">Извините! Ваше устройство не поддерживает речевой ввод</string>
 	<string name="alphabet">Отсортировать по алфавиту</string>
 	<string name="addition">Отсортировать по добавлению</string>
-	
-    
+	<string name="load_dictionary">Загрузить словарь</string>
+	<string name="settings">Настройки</string>
+
 </resources>
