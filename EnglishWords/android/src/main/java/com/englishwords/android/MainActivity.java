@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -25,14 +28,12 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
 		Button add_words = (Button)findViewById(R.id.button3);
 		Button show = (Button)findViewById(R.id.button4);
 		Button exit = (Button)findViewById(R.id.button5);
-		Button settings = (Button)findViewById(R.id.button6);
 
 		english.setOnClickListener(this);
 		russian.setOnClickListener(this);
 		add_words.setOnClickListener(this);
 		show.setOnClickListener(this);
 		exit.setOnClickListener(this);
-		settings.setOnClickListener(this);
 
 		tts = new TTSManager(this);
 	}
@@ -60,10 +61,6 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
 			case R.id.button5:
 				android.os.Process.killProcess(android.os.Process.myPid());
 				break;
-			case R.id.button6:
-				Intent intentLoadDictionary = new Intent(MainActivity.this, LoadDictionary.class);
-				MainActivity.this.startActivity(intentLoadDictionary);
-				break;
 		}
 	}
 
@@ -79,6 +76,26 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
 	public void onDestroy() {
 		super.onDestroy();
 		tts.shutDown();
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.main, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle item selection
+		switch (item.getItemId()) {
+			case R.id.action_settings:
+				Intent intentLoadDictionary = new Intent(MainActivity.this, LoadDictionary.class);
+				MainActivity.this.startActivity(intentLoadDictionary);
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
+		}
 	}
 
 }
