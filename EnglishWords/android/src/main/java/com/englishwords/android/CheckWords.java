@@ -1,11 +1,15 @@
 package com.englishwords.android;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.speech.RecognizerIntent;
 import android.util.Log;
 import android.view.View;
@@ -28,6 +32,9 @@ public class CheckWords extends MainActivity {
 	private WordsDataSource datasource;
 	private AlertDialog.Builder adError;
 	private AlertDialog.Builder adConfirm;
+	private ProgressDialog progressDB;
+	private Handler handler;
+
 	private List<Word> valuesBD;
 
 	private final int REQ_CODE_SPEECH_INPUT = 100;
@@ -42,11 +49,11 @@ public class CheckWords extends MainActivity {
 		final String language = intent.getStringExtra("check");
 
 		final TextView checkWord = (TextView)findViewById(R.id.textView1);
-		Button answer = (Button)findViewById(R.id.button1);
-		Button dontKnow = (Button)findViewById(R.id.button2);
 		Button speech = (Button)findViewById(R.id.button3);
 		final Button hideText = (Button)findViewById(R.id.button4);
 		final EditText answerWord = (EditText)findViewById(R.id.editText1);
+		Button answer = (Button)findViewById(R.id.button1);
+		Button dontKnow = (Button)findViewById(R.id.button2);
 
 		if(language.equals("eng")) {
 			speech.setText(R.string.voice);
@@ -94,8 +101,8 @@ public class CheckWords extends MainActivity {
 
 				answerWord.setText("");
 				setWordForCheck(language, checkWord, hideText);
-				if(hideText.getText().toString().equals(getString(R.string.show_word))) {
-					tts.initQueue(valuesBD.get(wordId-1).getEnglish());
+				if (hideText.getText().toString().equals(getString(R.string.show_word))) {
+					tts.initQueue(valuesBD.get(wordId - 1).getEnglish());
 				}
 			}
 		});
@@ -122,6 +129,18 @@ public class CheckWords extends MainActivity {
 				answerWord.setText(answerWd);
 			}
 		});
+
+		progressDB = new ProgressDialog(this);
+		progressDB.setMessage("Обработка данных...");
+		progressDB.setIndeterminate(true);
+		progressDB.setCancelable(false);
+
+		handler =  new Handler() {
+			@Override
+			public void handleMessage(Message msg) {
+				progressDB.dismiss();
+			}
+		};
 
 		valuesBD = datasource.getAllWords();
 
@@ -154,22 +173,23 @@ public class CheckWords extends MainActivity {
 
 			@Override
 			public boolean onLongClick(View v) {
-				Word currentWd = (Word)valuesBD.get(wordId-1);
+				Word currentWd = (Word) valuesBD.get(wordId - 1);
 				long levelWd = currentWd.getLevel();
-				datasource.changeLevel(currentWd, levelWd+2);
 
-				if(language.equals("eng")) {
+				datasource.changeLevel(currentWd, levelWd + 2);
+				if (levelWd + 2 > 10) {
+					changeLevels(1);
+				} else if (language.equals("eng")) {
 					showToast(currentWd.getRussian());
-				}
-				else if(language.equals("rus")) {
+				} else if (language.equals("rus")) {
 					showToast(currentWd.getEnglish());
 				}
 
 				valuesBD = datasource.getAllWords();
 				answerWord.setText("");
 				setWordForCheck(language, checkWord, hideText);
-				if(hideText.getText().toString().equals(getString(R.string.show_word))) {
-					tts.initQueue(valuesBD.get(wordId-1).getEnglish());
+				if (hideText.getText().toString().equals(getString(R.string.show_word))) {
+					tts.initQueue(valuesBD.get(wordId - 1).getEnglish());
 				}
 				return true;
 			}
@@ -178,18 +198,17 @@ public class CheckWords extends MainActivity {
 		dontKnow.setOnClickListener(
 				new View.OnClickListener() {
 					public void onClick(View view) {
-						Word currentWd = (Word)valuesBD.get(wordId-1);
+						Word currentWd = (Word) valuesBD.get(wordId - 1);
 
 						Log.d("myTag", String.valueOf(currentWd.getLevel()));
 
 						//long levelWd = currentWd.getLevel();
 						String checkWd = null;
 						String resultWd = null;
-						if(language.equals("eng")) {
+						if (language.equals("eng")) {
 							checkWd = currentWd.getEnglish();
 							resultWd = currentWd.getRussian();
-						}
-						else if(language.equals("rus")) {
+						} else if (language.equals("rus")) {
 							checkWd = currentWd.getRussian();
 							resultWd = currentWd.getEnglish();
 						}
@@ -198,30 +217,35 @@ public class CheckWords extends MainActivity {
 						adError.show();
 
 						datasource.changeKnowledge(currentWd, 0);
-						if(datasource.countZeroKnowledge() >= 10) {
+						if (datasource.countZeroKnowledge() >= 10) {
 							Log.d("myTag", "Reset to repeat");
 							resetToRepeat();
-							Thread threadChLev = new Thread() {
-								public void run() {
-									for(int i=0; i<valuesBD.size(); ++i) {
-										if(valuesBD.get(i).getLevel() != 0)
-											datasource.changeLevel((Word)valuesBD.get(i), 3);
-									}
-								}
-							};
-							threadChLev.start();
+							changeLevels(3);
 						}
 					}
 
 					private void resetToRepeat() {
 						List<Word> zeroKnowledge = datasource.getZeroKnowledge();
 						int size = zeroKnowledge.size();
-						for(int i=0; i<size; ++i) {
-							datasource.changeLevel((Word)zeroKnowledge.get(i), 0);
-							datasource.changeKnowledge((Word)zeroKnowledge.get(i), 1);
+						for (int i = 0; i < size; ++i) {
+							datasource.changeLevel((Word) zeroKnowledge.get(i), 0);
+							datasource.changeKnowledge((Word) zeroKnowledge.get(i), 1);
 						}
 					}
 				});
+	}
+
+	private void changeLevels(final long level) {
+		progressDB.show();
+		new Thread() {
+			public void run() {
+				for(int i=0; i<valuesBD.size(); ++i) {
+					if(valuesBD.get(i).getLevel() != 0)
+						datasource.changeLevel((Word)valuesBD.get(i), level);
+				}
+				handler.sendEmptyMessage(0);
+			}
+		}.start();
 	}
 
 	private void getAnswer(String answerWd, String language, EditText answerWord, TextView checkWord, Button hideText) {
@@ -248,16 +272,11 @@ public class CheckWords extends MainActivity {
 		else {
 			datasource.changeLevel(currentWd, levelWd+1);
 			if (levelWd+1 > 10) {
-				Thread threadChLev = new Thread() {
-					public void run() {
-						for(int i=0; i<valuesBD.size(); ++i) {
-							datasource.changeLevel((Word)valuesBD.get(i), 1);
-						}
-					}
-				};
-				threadChLev.start();
+				changeLevels(1);
 			}
-			showToast("Правильно!");
+			else {
+				showToast("Правильно!");
+			}
 
 			valuesBD = datasource.getAllWords();
 
